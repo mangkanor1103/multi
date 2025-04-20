@@ -1,0 +1,29 @@
+Tagalog: "Ako ay masaya."
+Mangyan (Hanunuo): "Ak ga masaya."
+
+Tagalog: "Saan ka pupunta?"
+Mangyan (Hanunuo): "Ayep ka mapan?"
+
+Tagalog: "Anong ginagawa mo?"
+Mangyan (Hanunuo): "Ano ga rayam mu?"
+
+Tagalog: "Mahal kita."
+Mangyan (Hanunuo): "Kaayupanan ka ak."
+
+Tagalog: "Magandang umaga."
+Mangyan (Hanunuo): "Magan adlaw."
+
+Tagalog: "Salamat sa tulong mo."
+Mangyan (Hanunuo): "Mabud sa bulig mu."
+
+Tagalog: "Kailan tayo magkikita?"
+Mangyan (Hanunuo): "Kena tamo masugat?"
+
+Tagalog: "Gusto ko ng tubig."
+Mangyan (Hanunuo): "Gana ak danum."
+
+Tagalog: "Masarap ang pagkain."
+Mangyan (Hanunuo): "Mabud ang kan-on."
+
+Tagalog: "Paalam sa iyo."
+Mangyan (Hanunuo): "Bay-bay sa imu."
