@@ -56,12 +56,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-Language Translator</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Moving gradient background */
+        body {
+            background: linear-gradient(120deg, #84fab0, #8fd3f4);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Enhanced button styles */
+        button {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        /* Card shadow for form and results */
+        .card {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+    <script>
+        // Voice recognition functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            const sentenceInput = document.querySelector('input[name="sentence"]');
+            const voiceButton = document.getElementById('voiceButton');
+
+            recognition.lang = 'en-US'; // Set the language for recognition
+            recognition.interimResults = false;
+
+            voiceButton.addEventListener('click', () => {
+                recognition.start();
+            });
+
+            recognition.addEventListener('result', (event) => {
+                const transcript = event.results[0][0].transcript;
+                sentenceInput.value = transcript; // Set the recognized text in the input field
+                document.querySelector('form').submit(); // Auto-submit the form for translation
+            });
+
+            recognition.addEventListener('error', (event) => {
+                alert('Voice recognition error: ' + event.error);
+            });
+        });
+    </script>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans">
+<body class="text-gray-800 font-sans">
     <!-- Header Section -->
     <header class="bg-green-500 text-white py-6 shadow-lg">
         <div class="max-w-4xl mx-auto text-center">
-            <h1 class="text-3xl font-bold">Multi-Language Translator</h1>
+            <h1 class="text-4xl font-bold">Multi-Language Translator</h1>
             <p class="text-lg mt-2">Translate between Tagalog, Mangyan, and English</p>
         </div>
     </header>
@@ -76,8 +130,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         </div>
 
         <!-- Translation Form -->
-        <div class="bg-white p-8 rounded-lg shadow-md">
-            <h2 class="text-2xl font-semibold mb-4">Translate Between Languages</h2>
+        <div class="bg-white p-8 rounded-lg card">
+            <h2 class="text-3xl font-semibold mb-4">Translate Between Languages</h2>
             <form action="" method="GET" class="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-8">
                 <!-- Left Column: Translation Button and Result -->
                 <div class="flex-1">
@@ -85,6 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                         <input type="text" name="sentence" placeholder="Enter sentence..." class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500" required>
                     </div>
                     <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition">Translate</button>
+                    <button type="button" id="voiceButton" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition mt-2">🎤 Speak</button>
                     <?php if ($translationResult): ?>
                         <div class="mt-4 bg-gray-100 p-4 rounded-lg">
                             <h3 class="text-lg font-semibold">Translation Result:</h3>
@@ -103,27 +158,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                             <label class="cursor-pointer">
                                 <input type="radio" name="source" value="tagalog" class="hidden peer" required>
                                 <div class="p-4 bg-gray-100 rounded-lg shadow-md hover:bg-green-100 peer-checked:bg-green-500 peer-checked:text-white transition">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 peer-checked:text-white text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                                    </svg>
                                     <span class="block text-sm font-medium">Tagalog</span>
                                 </div>
                             </label>
                             <label class="cursor-pointer">
                                 <input type="radio" name="source" value="mangyan" class="hidden peer" required>
                                 <div class="p-4 bg-gray-100 rounded-lg shadow-md hover:bg-green-100 peer-checked:bg-green-500 peer-checked:text-white transition">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 peer-checked:text-white text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" />
-                                    </svg>
                                     <span class="block text-sm font-medium">Mangyan</span>
                                 </div>
                             </label>
                             <label class="cursor-pointer">
                                 <input type="radio" name="source" value="english" class="hidden peer" required>
                                 <div class="p-4 bg-gray-100 rounded-lg shadow-md hover:bg-green-100 peer-checked:bg-green-500 peer-checked:text-white transition">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 peer-checked:text-white text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h11M9 21V3m0 0L3 10m6-7l6 7" />
-                                    </svg>
                                     <span class="block text-sm font-medium">English</span>
                                 </div>
                             </label>
@@ -136,27 +182,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                             <label class="cursor-pointer">
                                 <input type="radio" name="target" value="tagalog" class="hidden peer" required>
                                 <div class="p-4 bg-gray-100 rounded-lg shadow-md hover:bg-green-100 peer-checked:bg-green-500 peer-checked:text-white transition">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 peer-checked:text-white text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                                    </svg>
                                     <span class="block text-sm font-medium">Tagalog</span>
                                 </div>
                             </label>
                             <label class="cursor-pointer">
                                 <input type="radio" name="target" value="mangyan" class="hidden peer" required>
                                 <div class="p-4 bg-gray-100 rounded-lg shadow-md hover:bg-green-100 peer-checked:bg-green-500 peer-checked:text-white transition">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 peer-checked:text-white text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" />
-                                    </svg>
                                     <span class="block text-sm font-medium">Mangyan</span>
                                 </div>
                             </label>
                             <label class="cursor-pointer">
                                 <input type="radio" name="target" value="english" class="hidden peer" required>
                                 <div class="p-4 bg-gray-100 rounded-lg shadow-md hover:bg-green-100 peer-checked:bg-green-500 peer-checked:text-white transition">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 peer-checked:text-white text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h11M9 21V3m0 0L3 10m6-7l6 7" />
-                                    </svg>
                                     <span class="block text-sm font-medium">English</span>
                                 </div>
                             </label>
