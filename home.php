@@ -10,7 +10,7 @@ function translateSentence($conn, $sentence, $sourceColumn, $targetColumn) {
     $translatedWords = [];
     $missingWordCount = 0; // Count of missing words
 
-    $stmt = $conn->prepare("SELECT $targetColumn FROM translations WHERE $sourceColumn = ?");
+    $stmt = $conn->prepare("SELECT $targetColumn FROM translation WHERE $sourceColumn = ?");
 
     foreach ($words as $word) {
         $stmt->bind_param("s", $word);
