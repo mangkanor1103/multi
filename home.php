@@ -91,6 +91,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             const sentenceInput = document.querySelector('input[name="sentence"]');
             const voiceButton = document.getElementById('voiceButton');
+            const speakButton = document.getElementById('speakButton');
+            const translationText = document.getElementById('translationText');
 
             recognition.lang = 'en-US'; // Set the language for recognition
             recognition.interimResults = false;
@@ -107,6 +109,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
             recognition.addEventListener('error', (event) => {
                 alert('Voice recognition error: ' + event.error);
+            });
+
+            speakButton.addEventListener('click', () => {
+                const utterance = new SpeechSynthesisUtterance(translationText.textContent);
+                window.speechSynthesis.speak(utterance);
             });
         });
     </script>
@@ -143,7 +150,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     <?php if ($translationResult): ?>
                         <div class="mt-4 bg-gray-100 p-4 rounded-lg">
                             <h3 class="text-lg font-semibold">Translation Result:</h3>
-                            <p class="text-gray-700"><?php echo $translationResult; ?></p>
+                            <p id="translationText" class="text-gray-700"><?php echo $translationResult; ?></p>
+                            <button type="button" id="speakButton" class="mt-2 bg-purple-500 text-white px-4 py-1 rounded-lg hover:bg-purple-600 transition">
+                                🔊 Listen
+                            </button>
                         </div>
                     <?php elseif ($errorMessage): ?>
                         <p class="text-red-500 mt-4"><?php echo $errorMessage; ?></p>
