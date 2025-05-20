@@ -1,21 +1,39 @@
 <?php
 session_start();
+require 'config.php'; // Include database connection
 
-if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
-    header("Location: admin.php");
-    exit();
-}
+$loginError = false;
 
+// Process login form
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-
-    if ($username === 'admin' && $password === 'kian1103') {
-        $_SESSION['admin_logged_in'] = true;
-        header("Location: admin.php");
-        exit();
+    if (!empty($_POST['username']) && !empty($_POST['password'])) {
+        $username = $conn->real_escape_string($_POST['username']);
+        $password = $_POST['password'];
+        
+        // Query to check if user exists
+        $sql = "SELECT * FROM admin WHERE username = '$username'";
+        $result = $conn->query($sql);
+        
+        if ($result->num_rows > 0) {
+            $admin = $result->fetch_assoc();
+            
+            // Verify password (using password_verify if passwords are hashed)
+            if (password_verify($password, $admin['password']) || $password === $admin['password']) {
+                // Set session variables
+                $_SESSION['admin_id'] = $admin['id'];
+                $_SESSION['admin_username'] = $admin['username'];
+                
+                // Redirect to admin dashboard
+                header("Location: home.php");
+                exit();
+            } else {
+                $loginError = true;
+            }
+        } else {
+            $loginError = true;
+        }
     } else {
-        $error = "Invalid username or password";
+        $loginError = true;
     }
 }
 ?>
@@ -25,131 +43,129 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Admin Login | MultiLingual</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-       body {
-    font-family: Arial, sans-serif;
-    background-color: #e0ffe0; /* Light background */
-    color: #006600; /* Dark green text color */
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-.container {
-    width: 30%;
-    margin: 80px auto;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 102, 0, 0.5);
-    position: relative;
-}
-
-.input-container {
-    position: relative;
-    margin-bottom: 20px;
-}
-
-.input-container input {
-    width: 100%; /* Full width */
-    padding: 10px 40px; /* Adjust padding for better spacing */
-    border: 1px solid #006600;
-    border-radius: 5px;
-    transition: all 0.3s ease-in-out;
-    box-sizing: border-box; /* Include padding and border in width */
-}
-
-.input-container i {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #006600;
-    transition: all 0.3s ease-in-out;
-}
-
-button {
-    width: 100%; /* Full width */
-    padding: 12px;
-    border: none;
-    border-radius: 5px;
-    background: #006600;
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-}
-
-button:hover {
-    background: #009900;
-}
-
-.back-button {
-    display: inline-block;
-    margin-top: 15px;
-    text-decoration: none;
-    color: #006600;
-    font-size: 16px;
-    transition: all 0.3s ease-in-out;
-}
-
-.back-button:hover {
-    color: #009900;
-    transform: translateX(-5px);
-}
-
-.error {
-    color: red;
-}
-.moving-icons {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none; /* Prevent interaction with icons */
-            overflow: hidden; /* Hide overflow */
-            z-index: 0; /* Behind other content */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f9ff;
+            background-image: 
+                radial-gradient(at 80% 10%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 20% 90%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
         }
-        .moving-icons i {
-            position: absolute;
-            font-size: 50px; /* Size of icons */
-            color: rgba(0, 128, 0, 0.5); /* Light green color */
-            animation: move 10s linear infinite; /* Animation for moving icons */
-        }
-        @keyframes move {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-100vh); }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
-<body>
-    <div class="moving-icons">
-        <i class="fas fa-user" style="top: 10%; left: 10%; animation-delay: 0s;"></i>
-        <i class="fas fa-lock" style="top: 20%; left: 30%; animation-delay: 2s;"></i>
-        <i class="fas fa-key" style="top: 30%; left: 50%; animation-delay: 4s;"></i>
-        <i class="fas fa-user-shield" style="top: 40%; left: 70%; animation-delay: 6s;"></i>
-        <i class="fas fa-comments" style="top: 50%; left: 90%; animation-delay: 8s;"></i>
-    </div>
+<body class="min-h-screen flex flex-col">
+    <!-- Navigation -->
+    <nav class="bg-gradient-to-r from-indigo-600 to-blue-500 text-white py-3 px-6 shadow-lg">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-language text-2xl"></i>
+                <h1 class="text-xl font-bold">MultiLingual</h1>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="index.php" class="hover:text-blue-100 font-medium">Home</a>
+                <a href="test.php" class="hover:text-blue-100 font-medium">Mangyan Alphabet</a>
+                <a href="about.php" class="hover:text-blue-100 font-medium">About</a>
+            </div>
+        </div>
+    </nav>
 
-    <div class="container">
-        <h2>Admin Login</h2>
-        <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
-        <form method="POST">
-            <div class="input-container">
-                <input type="text" name="username" placeholder="Username" required>
-                <i class="fas fa-user"></i>
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center px-6 py-12">
+        <div class="w-full max-w-md">
+            <!-- Login Form -->
+            <div class="glass-card rounded-2xl overflow-hidden">
+                <div class="bg-gradient-to-r from-indigo-600 to-blue-500 px-6 py-4">
+                    <h2 class="text-xl font-bold text-white flex items-center">
+                        <i class="fas fa-lock mr-2"></i>
+                        Admin Login
+                    </h2>
+                </div>
+                
+                <form method="POST" action="login.php" class="p-6">
+                    <?php if($loginError): ?>
+                    <div class="bg-red-50 border border-red-200 text-red-600 rounded-lg p-4 mb-6 flex items-start">
+                        <i class="fas fa-exclamation-circle mt-1 mr-3"></i>
+                        <p>Invalid username or password. Please try again.</p>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <div class="mb-4">
+                        <label for="username" class="block text-gray-700 font-medium mb-2">Username</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                            <input type="text" name="username" id="username" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="password" class="block text-gray-700 font-medium mb-2">Password</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-key text-gray-400"></i>
+                            </div>
+                            <input type="password" name="password" id="password" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <button type="button" id="togglePassword" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Sign In
+                    </button>
+                    
+                    <div class="mt-6 text-center">
+                        <a href="index.php" class="text-indigo-600 hover:text-indigo-800 text-sm">
+                            <i class="fas fa-arrow-left mr-1"></i>
+                            Return to Main Site
+                        </a>
+                    </div>
+                </form>
             </div>
-            <div class="input-container">
-                <input type="password" name="password" placeholder="Password" required>
-                <i class="fas fa-lock"></i>
-            </div>
-            <button type="submit">Login</button>
-        </form>
-        <a href="index.php" class="back-button"><i class="fas fa-arrow-left"></i> Back</a>
-    </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 py-4 px-4">
+        <div class="max-w-6xl mx-auto text-center">
+            <p class="text-xs">&copy; 2025 MultiLingual Translator. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    </script>
 </body>
 </html>
