@@ -176,7 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     <div id="mobileMenuItems" class="hidden bg-blue-600 text-white py-4 px-6 md:hidden">
         <a href="index.php" class="block py-2 hover:bg-blue-700 px-3 rounded">Home</a>
         <a href="test.php" class="block py-2 hover:bg-blue-700 px-3 rounded">Mangyan Alphabet</a>
-        <a href="#about" class="block py-2 hover:bg-blue-700 px-3 rounded">About</a>
+        <a href="about.php" class="block py-2 hover:bg-blue-700 px-3 rounded">About</a>
     </div>
 
     <!-- Mini Hero Section - Compact Version -->
@@ -199,12 +199,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             <div class="glass-card rounded-2xl overflow-hidden mb-8">
                 <!-- Tabs for Translation Type -->
                 <div class="flex border-b border-gray-200">
-                    <button class="flex-1 py-3 font-medium text-blue-600 border-b-2 border-blue-600">
+                    <a href="index.php" class="flex-1 py-3 font-medium text-blue-600 border-b-2 border-blue-600 text-center">
                         <i class="fas fa-exchange-alt mr-2"></i> Text Translation
-                    </button>
-                    <button class="flex-1 py-3 font-medium text-gray-500 hover:text-gray-800 custom-transition">
+                    </a>
+                    <a href="dictionary.php" class="flex-1 py-3 font-medium text-gray-500 hover:text-gray-800 custom-transition text-center">
                         <i class="fas fa-book mr-2"></i> Dictionary
-                    </button>
+                    </a>
                 </div>
                 
                 <!-- Translation Form -->
